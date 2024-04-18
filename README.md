@@ -221,6 +221,6 @@ git remote -v
 git status
 git add .gitignore
 git add .
-git commit -m"init"
+git commit -m"host file case"
 git push origin main
 ~~~
