@@ -184,3 +184,43 @@ az resource show -g $prefix -n $prefix --api-version "2023-09-01" --resource-typ
 Test via Azure Portal from my local pc does not show an error message, instead I do get the Message: "No results found from the last 7 days  
 Try  selecting another time range".
 
+### DNS Host file
+
+We will use the windows DNS Hostfile to bypass the private DNS name resolution for the api.privatelink.monitor.azure.com.
+
+~~~powershell
+# you need to be on the Azure VM
+# Make sure to run the following command as Administrator
+note C:\Windows\System32\drivers\etc api.monitor.azure.com 
+# add the following line to the file
+20.218.184.197 api.privatelink.monitor.azure.com
+20.218.184.197 api.loganalytics.io
+# nslookup will not work on host file changes, so please use ping
+ping api.loganalytics.io
+
+Pinging api.loganalytics.io [20.218.184.197] with 32 bytes of data:
+Request timed out.
+
+# query from external law
+az monitor log-analytics query -w $workspaceidext --analytics-query "StorageBlobLogs | where TimeGenerated > ago(6d)| where CorrelationId == '8a5fb302-301e-0011-735c-91632d000000'" # 200 OK
+~~~
+
+To overcome this you will need to make use of Azure Network Security Group (NSG) to block the traffic to the public IP address of the api.loganalytics.io.
+
+## Misc
+
+### github
+
+~~~ bash
+gh auth login
+gh repo create $prefix --public
+git init
+git remote remove origin
+git remote add origin https://github.com/cpinotossi/$prefix.git
+git remote -v
+git status
+git add .gitignore
+git add .
+git commit -m"init"
+git push origin main
+~~~

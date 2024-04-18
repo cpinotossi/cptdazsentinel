@@ -53,7 +53,7 @@ resource ampls 'microsoft.insights/privatelinkscopes@2021-07-01-preview' = {
       // Specifies the default access mode of queries through associated private endpoints in scope. 
       // If not specified default value is 'Open'. 
       // You can override this default setting for a specific private endpoint connection by adding an exclusion in the 'exclusions' array.	
-      queryAccessMode: 'Open'
+      queryAccessMode: 'PrivateOnly'
     }
   }
 }
