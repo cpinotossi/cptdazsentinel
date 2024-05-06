@@ -207,6 +207,10 @@ az monitor log-analytics query -w $workspaceidext --analytics-query "StorageBlob
 
 To overcome this you will need to make use of Azure Network Security Group (NSG) to block the traffic to the public IP address of the api.loganalytics.io.
 
+### Azure Monitor and Data Collection Endpoint
+
+https://cptdazsentinel-yjxe.eastus-1.handler.control.monitor.azure.com
+
 ## Misc
 
 ### github
