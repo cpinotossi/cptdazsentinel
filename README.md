@@ -44,7 +44,7 @@ Address:  10.0.0.13
 
 Like we can see most of the magic happens on api.privatelink.monitor.azure.com. Thats where AMPLS makes a decision about which IP to use, private or public.
 
-## Verify DNS lookup on my local pc:
+### Verify DNS lookup on my local pc:
 
 ~~~powershell
 nslookup api.loganalytics.io
@@ -124,7 +124,7 @@ Log query request is send to https://api.loganalytics.io:443
 az network private-endpoint-connection update --name $prefix --resource-group $prefix --status Rejected
 ~~~
 
-# Show current status
+### Show current status
 
 ~~~powershell
 az resource show -g $prefix -n $prefix --api-version "2021-07-01-preview" --resource-type Microsoft.Insights/privateLinkScopes --query properties.accessModeSettings
@@ -210,6 +210,33 @@ To overcome this you will need to make use of Azure Network Security Group (NSG)
 ### Azure Monitor and Data Collection Endpoint
 
 https://cptdazsentinel-yjxe.eastus-1.handler.control.monitor.azure.com
+
+## AMPLS and the DNS overwrite issue
+
+~~~powershell
+az provider register --namespace Microsoft.Network
+az provider show --namespace Microsoft.Network --query "registrationState"
+$currentUserObjectId=az ad signed-in-user show --query id -o tsv
+$location="germanywestcentral"
+$prefix="cptdazampls"
+az group create --name $prefix --location $location
+az deployment group create --name $prefix --resource-group $prefix --template-file amplsmultidns.bicep --parameters principalId=$currentUserObjectId
+az group delete -n $prefix --yes --no-wait
+$sa1ResourceId=az resource show -n ${prefix}1 -g $prefix --resource-type "Microsoft.Storage/storageAccounts" --query id -o tsv
+
+az monitor diagnostic-settings categories -h list --resource $sa1ResourceId
+
+# list private dns zones records for the storage account
+az network private-dns record-set a list -g $prefix --zone-name privatelink.blob.core.windows.net --query "[].fqdn" # scadvisorcontentpl.privatelink.blob.core.windows.net
+
+~~~
+
+https://app.atroposs.com/#/start
+
+
+
+  "cptdazampls1.privatelink.blob.core.windows.net.",
+  "scadvisorcontentpl.privatelink.blob.core.windows.net."
 
 ## Misc
 
